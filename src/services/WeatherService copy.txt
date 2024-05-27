@@ -1,0 +1,40 @@
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+
+const BaseURL = "https://api.openweathermap.org/data/2.5/weather?";
+const API_Key = "881c8a007fdac03b92300ab99d8d3609";
+
+function WeatherService() {
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [city, setCity] = useState({});
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      setLatitude(position.coords.latitude);
+      setLongitude(position.coords.longitude);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      const finalBaseURL = `${BaseURL}lat=${latitude}&lon=${longitude}&appid=${API_Key}`;
+      axios.get(finalBaseURL)
+        .then((res) => {
+          console.log(res.data);
+          setCity(res.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching weather data: ", error);
+        });
+    }
+  }, [latitude, longitude]);
+
+  return (
+    <div>
+      <h1>{city.name}</h1>
+    </div>
+  );
+}
+
+export default WeatherService;
